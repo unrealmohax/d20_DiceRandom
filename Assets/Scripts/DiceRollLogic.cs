@@ -11,27 +11,33 @@ public class DiceRollLogic : IDisposable
     public DiceRollLogic(DiceRollView diceRollpopup)
     {
         _diceRollpopup = diceRollpopup;
-        EventController.AddListener(EventMessage.OnRollDice, RollDice);
+        EventController.AddListener(EventMessage.OnRollButtonClick, RollDice);
         EventController.AddListener(EventMessage.OnStopDice, StopDice);
         EventController.AddListener(EventMessage.OnRestartGame, RestartGame);
+        EventController.AddListener(EventMessage.OnSumWithBonus, SumWithBonus);
         Generate();
     }
 
     private void RollDice() 
     {
         _randomValue = Random.Range(1, 21);
+        EventController.Invoke(EventMessage.OnRollDice, _randomValue);
     }
 
     private void StopDice() 
     {
         bool win = _randomValue + _randomBonus >= _requiredValue;
-        
         EventController.Invoke(EventMessage.OnFinishGame, win);
     }
 
     public void RestartGame() 
     {
         Generate();
+    }
+
+    private void SumWithBonus() 
+    {
+        EventController.Invoke(EventMessage.OnRandomAndBonusPoint, _randomValue, _randomBonus);
     }
 
     private void Generate() 
@@ -47,7 +53,8 @@ public class DiceRollLogic : IDisposable
 
     public void Dispose()
     {
-        EventController.RemoveListener(EventMessage.OnRollDice, RollDice);
+        EventController.RemoveListener(EventMessage.OnSumWithBonus, SumWithBonus);
+        EventController.RemoveListener(EventMessage.OnRollButtonClick, RollDice);
         EventController.RemoveListener(EventMessage.OnStopDice, StopDice);
         EventController.RemoveListener(EventMessage.OnRestartGame, RestartGame);
     }

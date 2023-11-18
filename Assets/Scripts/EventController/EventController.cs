@@ -7,10 +7,13 @@ using UnityEngine;
 public enum EventMessage
 {
     OnStartNewGame,
+    OnRollButtonClick,
     OnRollDice,
     OnStopDice,
+    OnRandomAndBonusPoint,
     OnRestartGame,
     OnFinishGame,
+    OnSumWithBonus,
 }
 
 public class EventController : MonoBehaviour

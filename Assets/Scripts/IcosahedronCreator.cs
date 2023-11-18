@@ -9,15 +9,13 @@ public class IcosahedronCreator
     private readonly MeshFilter _meshFilter;
     private readonly MeshRenderer _meshRenderer;
     private readonly Material _material;
-    private readonly ParticleSystem _particleSystem;
     
-    public IcosahedronCreator(Transform transform, MeshFilter meshFilter, MeshRenderer meshRenderer, Material material, ParticleSystem particleSystem)
+    public IcosahedronCreator(Transform transform, MeshFilter meshFilter, MeshRenderer meshRenderer, Material material)
     {
         _material = material ?? throw new Exception("Error when creating IcosahedronCreator (Material - null)");
         _transform = transform ?? throw new Exception("Error when creating IcosahedronCreator (Transform - null)");
         _meshFilter = meshFilter ?? throw new Exception("Error when creating IcosahedronCreator (MeshFilter - null)");
         _meshRenderer = meshRenderer ?? throw new Exception("Error when creating IcosahedronCreator (MeshRenderer - null)");
-        _particleSystem = particleSystem ?? throw new Exception("Error when creating IcosahedronCreator (ParticleSystem - null)");
     }
 
     public void CreateIcosahedron(ref List<TextMeshPro> TextMeshPros)
@@ -74,18 +72,8 @@ public class IcosahedronCreator
         SetNormals(mesh);
         _meshFilter.mesh = mesh;
 
-        SerParticleMesh(_particleSystem, mesh);
-
         _meshRenderer.material = _material;
         SetText(vertices, triangles, ref TextMeshPros);
-    }
-
-    private void SerParticleMesh(ParticleSystem particleSystem, Mesh mesh)
-    {
-        var shape = particleSystem.shape;
-        shape.enabled = true;
-        shape.shapeType = ParticleSystemShapeType.Mesh;
-        shape.mesh = mesh;
     }
 
     private void SetText(Vector3[] vertices, int[] triangles, ref List<TextMeshPro> TextMeshPros)
@@ -101,10 +89,10 @@ public class IcosahedronCreator
             TextMeshPros.Add(textMesh);
 
             RectTransform textObjecRect = textObject.GetComponent<RectTransform>();
-            textObjecRect.sizeDelta = new Vector2(1, 1);
+            textObjecRect.sizeDelta = new Vector2(1.5f, 1.5f);
 
             textMesh.text = (i / 3 + 1).ToString();
-            textMesh.fontSize = 8;
+            textMesh.fontSize = 10;
             textMesh.alignment = TextAlignmentOptions.Center;
 
             int vertexIndex1 = triangles[i];
@@ -115,7 +103,7 @@ public class IcosahedronCreator
             center = new Vector3(center.x * _transform.localScale.x, center.y * _transform.localScale.y, center.z * _transform.localScale.z);
             textObject.transform.position = center;
 
-            textObject.transform.LookAt(_transform.position);
+            textObject.transform.LookAt(_transform.position, vertices[vertexIndex3]);
         }
     }
 

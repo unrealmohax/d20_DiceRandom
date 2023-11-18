@@ -3,18 +3,20 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class IcosahedronMover
+public class IcosahedronMover : IDisposable
 {
     private readonly IMovableWithinBounds _movable;
     private Vector3 _startPosition;
     private CoroutineTask _moveToPoint;
+    private int lastWallIndex;
 
     public IcosahedronMover(IMovableWithinBounds imovable)
     {
         _movable = imovable;
+        EventController.AddListener<int>(EventMessage.OnRollDice, StartMove);
     }
 
-    public void StartMove()
+    private void StartMove(int randomIndex)
     {
         _startPosition = _movable.MovableTransform.position;
         CoroutineController.StartCoroutine(MoveRoutine(), "MoveRoutine");
@@ -59,7 +61,14 @@ public class IcosahedronMover
     private Wall GetRandomEnumValue()
     {
         Array values = Enum.GetValues(typeof(Wall));
-        int randomIndex = Random.Range(0, values.Length);
+        int randomIndex = 0;
+        do 
+        {
+            randomIndex = Random.Range(0, values.Length);
+        } 
+        while (randomIndex == lastWallIndex);
+        lastWallIndex = randomIndex;
+
         return (Wall)values.GetValue(randomIndex);
     }
 
@@ -85,6 +94,11 @@ public class IcosahedronMover
                 break;
         }
         return newPosition;
+    }
+
+    public void Dispose()
+    {
+        EventController.RemoveListener<int>(EventMessage.OnRollDice, StartMove);
     }
 
     enum Wall 
