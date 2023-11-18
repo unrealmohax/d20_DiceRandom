@@ -21,7 +21,7 @@ public class DiceRollView : MonoBehaviour
 
     [SerializeField] private ParticleSystem _bonusParticles;
 
-    private const string SUCCSESS = "Sucsess";
+    private const string SUCCSESS = "Success";   
     private const string FAILURE = "Failure";
 
     public ParticleSystem BonusParticles => _bonusParticles;
@@ -35,16 +35,19 @@ public class DiceRollView : MonoBehaviour
         _restartButton.onClick.AddListener(RestartViewNewGame);
     }
 
+    // Method to set the value text on the UI
     public void SetValueText(uint value)
     {
         _valueText.text = value.ToString();
     }
 
+    // Method to set the bonus value text on the UI
     public void SetBonusValueText(uint value)
     {
         _bonusText.text = value.ToString();
     }
 
+    // Method to initialize the UI for a new game
     private void RestartViewNewGame()
     {
         _rollButton.gameObject.SetActive(false);
@@ -57,17 +60,21 @@ public class DiceRollView : MonoBehaviour
         CoroutineController.StartCoroutine(DelayOnButton());
     }
 
-    private IEnumerator DelayOnButton() 
+    // Coroutine to introduce a delay before showing the roll button
+    private IEnumerator DelayOnButton()
     {
         yield return new WaitForSeconds(0.5f);
         _rollButton.gameObject.SetActive(true);
     }
+
+    // Method to handle the roll button click event
     private void RollButtonClick()
     {
         EventController.Invoke(EventMessage.OnRollButtonClick);
         _rollButton.gameObject.SetActive(false);
     }
 
+    // Method to handle the finish game event
     private void FinishGame(bool isWin)
     {
         if (int.Parse(_bonusText.text) > 0)
@@ -87,7 +94,8 @@ public class DiceRollView : MonoBehaviour
         }
     }
 
-    private IEnumerator WaitParticles(Action callback) 
+    // Coroutine to wait for the bonus particles to finish before triggering further events
+    private IEnumerator WaitParticles(Action callback)
     {
         yield return new WaitForSeconds(1);
         EventController.Invoke(EventMessage.OnSumWithBonus);
@@ -96,6 +104,7 @@ public class DiceRollView : MonoBehaviour
         callback?.Invoke();
     }
 
+    // Method to set the result text on the UI based on win/loss
     private void SetResultText(bool isWin)
     {
         _resultText.text = isWin ? SUCCSESS : FAILURE;
@@ -105,6 +114,7 @@ public class DiceRollView : MonoBehaviour
         _resultText.gameObject.SetActive(true);
     }
 
+    // Coroutine to fade in text over time
     private IEnumerator FadeInText(TextMeshProUGUI text, Action callback = null)
     {
         float currentTime = 0f;
@@ -121,6 +131,7 @@ public class DiceRollView : MonoBehaviour
         callback?.Invoke();
     }
 
+    // Coroutine to fade out text over time
     private IEnumerator FadeOutText(TextMeshProUGUI text, Action callback = null)
     {
         float currentTime = 0f;
@@ -137,11 +148,13 @@ public class DiceRollView : MonoBehaviour
         callback?.Invoke();
     }
 
+    // Method to set alpha value for text color
     private void SetAlphaTextColor(TextMeshProUGUI text, float alpha)
     {
         text.color = new Color(text.color.r, text.color.g, text.color.b, alpha);
     }
 
+    // Method to remove event listener when the object is destroyed
     private void OnDestroy()
     {
         EventController.RemoveListener<bool>(EventMessage.OnFinishGame, FinishGame);
